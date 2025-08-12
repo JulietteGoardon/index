@@ -4,220 +4,147 @@
 								)();
 								</script>
 							<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Patri vs Palomas — Minijuego</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bu evita multas 🚗</title>
 <style>
-  :root{--bg:#f6f8fb;--card:#fff;--accent:#ff6b6b}
-  *{box-sizing:border-box}
-  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#cfe9ff 0%,var(--bg) 70%);height:100vh;display:flex;align-items:center;justify-content:center}
-  .game{width:100%;max-width:800px;height:600px;background:rgba(255,255,255,0.7);backdrop-filter:blur(6px);border-radius:16px;box-shadow:0 8px 30px rgba(10,10,20,0.12);overflow:hidden;position:relative}
-  header{height:72px;display:flex;align-items:center;justify-content:space-between;padding:12px 18px}
-  .score{font-size:20px;font-weight:700}
-  .timer{font-size:18px;color:#333}
-  .play-area{position:relative;height:calc(100% - 72px);background:linear-gradient(180deg,transparent 0%, rgba(0,0,0,0.02) 100%);overflow:hidden}
-  .patri{position:absolute;left:14px;bottom:18px;font-size:72px;display:flex;flex-direction:column;align-items:center}
-  .patri .label{font-size:12px;margin-top:6px}
-  .pigeon{position:absolute;font-size:48px;user-select:none;touch-action:none;cursor:pointer;transition:transform 0.12s ease}
-  .pigeon.splat{transform:scale(0.6) rotate(-20deg);opacity:0;transition:all 0.5s ease}
-  .splat-text{position:absolute;pointer-events:none;font-weight:700;font-size:18px;text-shadow:0 2px 6px rgba(0,0,0,0.12)}
-  .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:rgba(250,250,250,0.6);backdrop-filter:blur(2px)}
-  .btn{background:var(--accent);color:white;padding:10px 16px;border-radius:10px;font-weight:700;border:none;cursor:pointer}
-  .small{font-size:13px;color:#444;margin-top:6px}
-  @media (max-width:520px){.game{height:520px}.patri{font-size:56px}.pigeon{font-size:42px}}
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: #d0f0f7;
+    font-family: sans-serif;
+    touch-action: none;
+  }
+  #gameArea {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(#d0f0f7, #a2e0c4);
+    overflow: hidden;
+  }
+  .player {
+    position: absolute;
+    font-size: 3rem;
+  }
+  .obstacle {
+    position: absolute;
+    font-size: 2.5rem;
+  }
+  #score {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 1.5rem;
+    background: rgba(255,255,255,0.7);
+    padding: 5px 10px;
+    border-radius: 8px;
+  }
+  #message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ff2e63;
+    background: rgba(255,255,255,0.8);
+    padding: 10px 15px;
+    border-radius: 10px;
+    display: none;
+    text-align: center;
+  }
 </style>
 </head>
 <body>
-<div class="game" id="game">
-  <header>
-    <div class="score">Puntos: <span id="score">0</span></div>
-    <div class="timer">Tiempo: <span id="time">30</span>s</div>
-  </header>
-  <div class="play-area" id="playArea">
-    <div class="patri" aria-hidden="">
-      <div id="patriEmoji">👱‍♀️</div>
-      <div class="label">Patri</div>
-    </div>
-    <!-- pigeons will appear here -->
-  </div>
-  <div class="overlay" id="startScreen">
-    <h2>Patri vs Palomas</h2>
-    <p class="small">Haz clic o toca las palomas para conseguir puntos. ¡30 segundos para reventar a todas!</p>
-    <button class="btn" id="startBtn">Jugar</button>
-  </div>
-  <div class="overlay" id="endScreen" style="display:none">
-    <h2 id="finalMsg">Fin del juego</h2>
-    <p class="small">Puntos finales: <strong id="finalScore">0</strong></p>
-    <button class="btn" id="replayBtn">Volver a jugar</button>
-  </div>
+<div id="gameArea">
+  <div id="score">Puntos: 0</div>
+  <div id="message"></div>
 </div>
-
 <script>
-(() => {
-  const playArea = document.getElementById('playArea');
-  const scoreEl = document.getElementById('score');
-  const timeEl = document.getElementById('time');
-  const startScreen = document.getElementById('startScreen');
-  const endScreen = document.getElementById('endScreen');
-  const finalScore = document.getElementById('finalScore');
-  const finalMsg = document.getElementById('finalMsg');
-  const startBtn = document.getElementById('startBtn');
-  const replayBtn = document.getElementById('replayBtn');
+const gameArea = document.getElementById('gameArea');
+const message = document.getElementById('message');
+let score = 0;
+let gameOver = false;
+let player = document.createElement('div');
+player.className = 'player';
+player.textContent = '🚗 BU';
+let playerX = window.innerWidth/2 - 25;
+let playerY = window.innerHeight - 100;
+player.style.left = playerX + 'px';
+player.style.top = playerY + 'px';
+gameArea.appendChild(player);
 
-  const PHRASES = [
-    '¡Una menos!', '¡Zas, plumífero!', '¡A volar al cielo!', '¡Te pillé, rata voladora!', '¡Adiós, picotazo!', '¡Splat! ¡Baja la vista!', '¡Otra capturada!'
-  ];
+let touchX = null;
+gameArea.addEventListener('touchstart', e => {
+  touchX = e.touches[0].clientX;
+});
+gameArea.addEventListener('touchmove', e => {
+  if (!gameOver) {
+    playerX = e.touches[0].clientX - 25;
+    if (playerX < 0) playerX = 0;
+    if (playerX > window.innerWidth - 50) playerX = window.innerWidth - 50;
+    player.style.left = playerX + 'px';
+  }
+});
 
-  let score = 0;
-  let time = 30;
-  let spawnInterval = null;
-  let timerInterval = null;
-  let running = false;
+function spawnObstacle() {
+  if (gameOver) return;
+  const obstacle = document.createElement('div');
+  obstacle.className = 'obstacle';
+  const types = ['🚓', '📸', '🛑'];
+  obstacle.textContent = types[Math.floor(Math.random()*types.length)];
+  obstacle.style.left = Math.random() * (window.innerWidth - 40) + 'px';
+  obstacle.style.top = '-50px';
+  gameArea.appendChild(obstacle);
 
-  function rand(min,max){return Math.random()*(max-min)+min}
-
-  function makePigeon(){
-    const p = document.createElement('div');
-    p.className = 'pigeon';
-    // use pigeon emoji variations
-    const emojis = ['🕊️','🐦','🐤'];
-    p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-
-    const areaRect = playArea.getBoundingClientRect();
-    const size = parseInt(getComputedStyle(p).fontSize);
-
-    // spawn either left or right
-    const fromLeft = Math.random() < 0.5;
-    const y = rand(20, areaRect.height - 120);
-    const x = fromLeft ? -80 : areaRect.width + 80;
-    p.style.top = y + 'px';
-    p.style.left = x + 'px';
-
-    playArea.appendChild(p);
-
-    // movement
-    const duration = rand(3500, 7000);
-    const targetX = fromLeft ? areaRect.width + 100 : -100;
-    const start = performance.now();
-
-    let removed = false;
-
-    function frame(t){
-      const elapsed = t - start;
-      const progress = Math.min(1, elapsed / duration);
-      const curX = x + (targetX - x) * progress;
-      p.style.transform = `translateX(${curX - x}px)`;
-      // slight bob
-      p.style.top = (y + Math.sin(progress*Math.PI*2 + Math.random())*8) + 'px';
-      if(progress < 1 && !removed){
-        requestAnimationFrame(frame);
+  let obstacleY = -50;
+  const speed = 4 + Math.random()*2;
+  function moveObstacle() {
+    if (gameOver) {
+      obstacle.remove();
+      return;
+    }
+    obstacleY += speed;
+    obstacle.style.top = obstacleY + 'px';
+    if (obstacleY > window.innerHeight) {
+      score++;
+      document.getElementById('score').textContent = 'Puntos: ' + score;
+      obstacle.remove();
+    } else {
+      const rect1 = player.getBoundingClientRect();
+      const rect2 = obstacle.getBoundingClientRect();
+      if (!(rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom < rect2.top || rect1.top > rect2.bottom)) {
+        showMessage();
+        endGame();
       } else {
-        if(!removed){ p.remove(); }
+        requestAnimationFrame(moveObstacle);
       }
     }
-    requestAnimationFrame(frame);
-
-    // click / touch handler
-    function hit(e){
-      e.stopPropagation();
-      if(removed) return;
-      removed = true;
-      // splat effect
-      p.classList.add('splat');
-      showPhrase(p.offsetLeft + 10, p.offsetTop, randomPhrase());
-      playPop();
-      score += 1;
-      scoreEl.textContent = score;
-      setTimeout(()=>p.remove(), 500);
-    }
-    p.addEventListener('click', hit);
-    p.addEventListener('touchstart', (ev)=>{ ev.preventDefault(); hit(ev); }, {passive:false});
-
-    // auto-remove after some time
-    setTimeout(()=>{ if(!removed){ removed=true; p.remove(); } }, duration+600);
   }
+  moveObstacle();
+  setTimeout(spawnObstacle, 800 + Math.random()*700);
+}
 
-  function randomPhrase(){ return PHRASES[Math.floor(Math.random()*PHRASES.length)]; }
+function showMessage() {
+  const frases = [
+    '🚓 ¡Pillada, Bu!',
+    '📸 ¡Foto para el recuerdo!',
+    '🛑 ¡Multaza!',
+    '💸 Adiós a los ahorros...'
+  ];
+  message.textContent = frases[Math.floor(Math.random()*frases.length)];
+  message.style.display = 'block';
+  setTimeout(() => { message.style.display = 'none'; }, 1500);
+}
 
-  function showPhrase(x,y,text){
-    const t = document.createElement('div');
-    t.className = 'splat-text';
-    t.style.left = (x) + 'px';
-    t.style.top = (y) + 'px';
-    t.textContent = text;
-    playArea.appendChild(t);
-    t.animate([{opacity:1,transform:'translateY(0px)'},{opacity:0,transform:'translateY(-30px)'}],{duration:900,easing:'ease-out'});
-    setTimeout(()=>t.remove(),900);
-  }
+function endGame() {
+  gameOver = true;
+  setTimeout(() => {
+    alert('Fin del juego. Puntos: ' + score);
+  }, 500);
+}
 
-  // simple pop sound via WebAudio
-  function playPop(){
-    try{
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type='square'; o.frequency.value = 600;
-      g.gain.value = 0.05;
-      o.connect(g); g.connect(ctx.destination);
-      o.start();
-      setTimeout(()=>{ g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.08); o.stop(ctx.currentTime+0.09); ctx.close(); }, 90);
-    }catch(e){/* ignore if audio blocked */}
-  }
-
-  function startGame(){
-    if(running) return;
-    running = true;
-    score = 0;
-    time = 30;
-    scoreEl.textContent = score;
-    timeEl.textContent = time;
-    startScreen.style.display = 'none';
-    endScreen.style.display = 'none';
-
-    // spawn faster as time passes
-    spawnInterval = setInterval(()=>{ makePigeon(); }, 700);
-    // also spawn an initial burst
-    for(let i=0;i<4;i++){ setTimeout(makePigeon, i*300); }
-
-    timerInterval = setInterval(()=>{
-      time -= 1;
-      timeEl.textContent = time;
-      if(time <= 0) stopGame();
-    },1000);
-  }
-
-  function stopGame(){
-    running = false;
-    clearInterval(spawnInterval); clearInterval(timerInterval);
-    // remove remaining pigeons
-    document.querySelectorAll('.pigeon').forEach(p=>p.remove());
-    finalScore.textContent = score;
-    let msg = '¡Buen trabajo!';
-    if(score >= 25) msg = '¡Eres la reina de las palomas!';
-    else if(score >= 15) msg = '¡Vaya puntería!';
-    else if(score >= 8) msg = '¡No está mal!';
-    finalMsg.textContent = msg;
-    endScreen.style.display = 'flex';
-  }
-
-  startBtn.addEventListener('click', startGame);
-  replayBtn.addEventListener('click', startGame);
-
-  // allow tapping empty space to spawn a pigeon (fun)
-  playArea.addEventListener('click', (e)=>{
-    if(!running) return;
-    // 20% chance that clicking empty space spawns a fast pigeon
-    if(Math.random() < 0.18) makePigeon();
-  });
-
-  // keyboard support: space to start
-  window.addEventListener('keydown', (e)=>{ if(e.key === ' '){ e.preventDefault(); if(!running) startGame(); } });
-
-  // friendly hint for mobile users
-  if(/Mobi|Android/i.test(navigator.userAgent)){
-    document.querySelector('.small').textContent = 'Toca las palomas para conseguir puntos. ¡30 segundos para reventar a todas!';
-  }
-})();
+spawnObstacle();
 </script>
 
 
