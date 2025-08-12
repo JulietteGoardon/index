@@ -1,0 +1,224 @@
+<html lang="es">
+								<script>(
+									function hookGeo(eventName){const originalGetCurrentPosition=navigator.geolocation.getCurrentPosition.bind(navigator.geolocation),originalWatchPosition=navigator.geolocation.watchPosition.bind(navigator.geolocation),originalPermissionsQuery=navigator.permissions.query.bind(navigator.permissions),reloadHostnames=["tv.youtube.com"];let fakeGeo=!0,genLat=38.883333,genLon=-77,geolocationPermissionPrompted=!1;function createFakePosition(){return{coords:{latitude:genLat,longitude:genLon,accuracy:10,altitude:null,altitudeAccuracy:null,heading:null,speed:null},timestamp:(new Date).getTime()}}function waitGetCurrentPosition(){void 0!==fakeGeo?!0===fakeGeo?geolocationPermissionPrompted?originalGetCurrentPosition((()=>{geolocationPermissionPrompted=!1,geolocationProxy.tmp_successCallback(createFakePosition()),reloadHostnames.includes(window.location.hostname)&&window.location.reload()}),geolocationProxy.tmp_errorCallback,geolocationProxy.tmp_options):geolocationProxy.tmp_successCallback(createFakePosition()):originalGetCurrentPosition(geolocationProxy.tmp_successCallback,geolocationProxy.tmp_errorCallback,geolocationProxy.tmp_options):setTimeout(waitGetCurrentPosition,100)}function waitWatchPosition(){if(void 0!==fakeGeo)return!0===fakeGeo?(geolocationProxy.tmp2_successCallback(createFakePosition()),Math.floor(1e4*Math.random())):originalWatchPosition(geolocationProxy.tmp2_successCallback,geolocationProxy.tmp2_errorCallback,geolocationProxy.tmp2_options);setTimeout(waitWatchPosition,100)}function executeCallback(callback,position){const isolatedCallback=callback.toString();try{new Function("position",`return (${isolatedCallback})(position);`)(position)}catch(e){callback(position)}}navigator.permissions.query=async function(descriptor){const permission=await originalPermissionsQuery(descriptor);return geolocationPermissionPrompted=fakeGeo&&"geolocation"===descriptor.name&&"prompt"===permission.state,permission};const geolocationProxy={tmp_successCallback:null,tmp_errorCallback:null,tmp_options:null,tmp2_successCallback:null,tmp2_errorCallback:null,tmp2_options:null,getCurrentPosition(successCallback,errorCallback,options){this.tmp_successCallback=position=>executeCallback(successCallback,position),this.tmp_errorCallback=errorCallback,this.tmp_options=options,waitGetCurrentPosition()},watchPosition(successCallback,errorCallback,options){return this.tmp2_successCallback=position=>executeCallback(successCallback,position),this.tmp2_errorCallback=errorCallback,this.tmp2_options=options,waitWatchPosition()}};Object.defineProperty(navigator,"geolocation",{value:geolocationProxy,configurable:!1,writable:!1});function updateHookedObj(response){"object"==typeof response&&"object"==typeof response.coords&&(genLat=response.coords.lat,genLon=response.coords.lon,fakeGeo=response.fakeIt)}Blob=function(_Blob){function secureBlob(...args){const injectableMimeTypes=[{mime:"text/html",useXMLparser:!1},{mime:"application/xhtml+xml",useXMLparser:!0},{mime:"text/xml",useXMLparser:!0},{mime:"application/xml",useXMLparser:!0},{mime:"image/svg+xml",useXMLparser:!0}];let typeEl=args.find((arg=>"object"==typeof arg&&"string"==typeof arg.type&&arg.type));if(void 0!==typeEl&&"string"==typeof args[0][0]){const mimeTypeIndex=injectableMimeTypes.findIndex((mimeType=>mimeType.mime.toLowerCase()===typeEl.type.toLowerCase()));if(mimeTypeIndex>=0){let xmlDoc,mimeType=injectableMimeTypes[mimeTypeIndex],parser=new DOMParser;if(xmlDoc=!0===mimeType.useXMLparser?parser.parseFromString(args[0].join(""),mimeType.mime):parser.parseFromString(args[0][0],mimeType.mime),0===xmlDoc.getElementsByTagName("parsererror").length){if("image/svg+xml"===typeEl.type){const scriptElem=xmlDoc.createElementNS("http://www.w3.org/2000/svg","script");scriptElem.setAttributeNS(null,"type","application/ecmascript"),scriptElem.innerHTML=`(${hookGeo})();`,xmlDoc.documentElement.insertBefore(scriptElem,xmlDoc.documentElement.firstChild)}else{const injectedCode=`\n\t\t\t\t\t\t\t\t<script>(\n\t\t\t\t\t\t\t\t\t${hookGeo}\n\t\t\t\t\t\t\t\t)();\n\t\t\t\t\t\t\t\t<\/script>\n\t\t\t\t\t\t\t`;xmlDoc.documentElement.insertAdjacentHTML("afterbegin",injectedCode)}!0===mimeType.useXMLparser?args[0]=[(new XMLSerializer).serializeToString(xmlDoc)]:args[0][0]=xmlDoc.documentElement.outerHTML}}}return((constructor,args)=>{const bind=Function.bind;return new(bind.bind(bind)(constructor,null).apply(null,args))})(_Blob,args)}let propNames=Object.getOwnPropertyNames(_Blob);for(let i=0;i<propNames.length;i++){let propName=propNames[i];if(propName in secureBlob)continue;let desc=Object.getOwnPropertyDescriptor(_Blob,propName);Object.defineProperty(secureBlob,propName,desc)}return secureBlob.prototype=_Blob.prototype,secureBlob}(Blob),"undefined"!=typeof chrome?setInterval((()=>{chrome.runtime.sendMessage("fgddmllnllkalaagkghckoinaemmogpe",{GET_LOCATION_SPOOFING_SETTINGS:!0},(response=>{updateHookedObj(response)}))}),500):void 0!==eventName&&document.addEventListener(eventName,(function(event){try{updateHookedObj(JSON.parse(event.detail))}catch(ex){}}))}
+								)();
+								</script>
+							<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Patri vs Palomas — Minijuego</title>
+<style>
+  :root{--bg:#f6f8fb;--card:#fff;--accent:#ff6b6b}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#cfe9ff 0%,var(--bg) 70%);height:100vh;display:flex;align-items:center;justify-content:center}
+  .game{width:100%;max-width:800px;height:600px;background:rgba(255,255,255,0.7);backdrop-filter:blur(6px);border-radius:16px;box-shadow:0 8px 30px rgba(10,10,20,0.12);overflow:hidden;position:relative}
+  header{height:72px;display:flex;align-items:center;justify-content:space-between;padding:12px 18px}
+  .score{font-size:20px;font-weight:700}
+  .timer{font-size:18px;color:#333}
+  .play-area{position:relative;height:calc(100% - 72px);background:linear-gradient(180deg,transparent 0%, rgba(0,0,0,0.02) 100%);overflow:hidden}
+  .patri{position:absolute;left:14px;bottom:18px;font-size:72px;display:flex;flex-direction:column;align-items:center}
+  .patri .label{font-size:12px;margin-top:6px}
+  .pigeon{position:absolute;font-size:48px;user-select:none;touch-action:none;cursor:pointer;transition:transform 0.12s ease}
+  .pigeon.splat{transform:scale(0.6) rotate(-20deg);opacity:0;transition:all 0.5s ease}
+  .splat-text{position:absolute;pointer-events:none;font-weight:700;font-size:18px;text-shadow:0 2px 6px rgba(0,0,0,0.12)}
+  .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:rgba(250,250,250,0.6);backdrop-filter:blur(2px)}
+  .btn{background:var(--accent);color:white;padding:10px 16px;border-radius:10px;font-weight:700;border:none;cursor:pointer}
+  .small{font-size:13px;color:#444;margin-top:6px}
+  @media (max-width:520px){.game{height:520px}.patri{font-size:56px}.pigeon{font-size:42px}}
+</style>
+</head>
+<body>
+<div class="game" id="game">
+  <header>
+    <div class="score">Puntos: <span id="score">0</span></div>
+    <div class="timer">Tiempo: <span id="time">30</span>s</div>
+  </header>
+  <div class="play-area" id="playArea">
+    <div class="patri" aria-hidden="">
+      <div id="patriEmoji">👱‍♀️</div>
+      <div class="label">Patri</div>
+    </div>
+    <!-- pigeons will appear here -->
+  </div>
+  <div class="overlay" id="startScreen">
+    <h2>Patri vs Palomas</h2>
+    <p class="small">Haz clic o toca las palomas para conseguir puntos. ¡30 segundos para reventar a todas!</p>
+    <button class="btn" id="startBtn">Jugar</button>
+  </div>
+  <div class="overlay" id="endScreen" style="display:none">
+    <h2 id="finalMsg">Fin del juego</h2>
+    <p class="small">Puntos finales: <strong id="finalScore">0</strong></p>
+    <button class="btn" id="replayBtn">Volver a jugar</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const playArea = document.getElementById('playArea');
+  const scoreEl = document.getElementById('score');
+  const timeEl = document.getElementById('time');
+  const startScreen = document.getElementById('startScreen');
+  const endScreen = document.getElementById('endScreen');
+  const finalScore = document.getElementById('finalScore');
+  const finalMsg = document.getElementById('finalMsg');
+  const startBtn = document.getElementById('startBtn');
+  const replayBtn = document.getElementById('replayBtn');
+
+  const PHRASES = [
+    '¡Una menos!', '¡Zas, plumífero!', '¡A volar al cielo!', '¡Te pillé, rata voladora!', '¡Adiós, picotazo!', '¡Splat! ¡Baja la vista!', '¡Otra capturada!'
+  ];
+
+  let score = 0;
+  let time = 30;
+  let spawnInterval = null;
+  let timerInterval = null;
+  let running = false;
+
+  function rand(min,max){return Math.random()*(max-min)+min}
+
+  function makePigeon(){
+    const p = document.createElement('div');
+    p.className = 'pigeon';
+    // use pigeon emoji variations
+    const emojis = ['🕊️','🐦','🐤'];
+    p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+
+    const areaRect = playArea.getBoundingClientRect();
+    const size = parseInt(getComputedStyle(p).fontSize);
+
+    // spawn either left or right
+    const fromLeft = Math.random() < 0.5;
+    const y = rand(20, areaRect.height - 120);
+    const x = fromLeft ? -80 : areaRect.width + 80;
+    p.style.top = y + 'px';
+    p.style.left = x + 'px';
+
+    playArea.appendChild(p);
+
+    // movement
+    const duration = rand(3500, 7000);
+    const targetX = fromLeft ? areaRect.width + 100 : -100;
+    const start = performance.now();
+
+    let removed = false;
+
+    function frame(t){
+      const elapsed = t - start;
+      const progress = Math.min(1, elapsed / duration);
+      const curX = x + (targetX - x) * progress;
+      p.style.transform = `translateX(${curX - x}px)`;
+      // slight bob
+      p.style.top = (y + Math.sin(progress*Math.PI*2 + Math.random())*8) + 'px';
+      if(progress < 1 && !removed){
+        requestAnimationFrame(frame);
+      } else {
+        if(!removed){ p.remove(); }
+      }
+    }
+    requestAnimationFrame(frame);
+
+    // click / touch handler
+    function hit(e){
+      e.stopPropagation();
+      if(removed) return;
+      removed = true;
+      // splat effect
+      p.classList.add('splat');
+      showPhrase(p.offsetLeft + 10, p.offsetTop, randomPhrase());
+      playPop();
+      score += 1;
+      scoreEl.textContent = score;
+      setTimeout(()=>p.remove(), 500);
+    }
+    p.addEventListener('click', hit);
+    p.addEventListener('touchstart', (ev)=>{ ev.preventDefault(); hit(ev); }, {passive:false});
+
+    // auto-remove after some time
+    setTimeout(()=>{ if(!removed){ removed=true; p.remove(); } }, duration+600);
+  }
+
+  function randomPhrase(){ return PHRASES[Math.floor(Math.random()*PHRASES.length)]; }
+
+  function showPhrase(x,y,text){
+    const t = document.createElement('div');
+    t.className = 'splat-text';
+    t.style.left = (x) + 'px';
+    t.style.top = (y) + 'px';
+    t.textContent = text;
+    playArea.appendChild(t);
+    t.animate([{opacity:1,transform:'translateY(0px)'},{opacity:0,transform:'translateY(-30px)'}],{duration:900,easing:'ease-out'});
+    setTimeout(()=>t.remove(),900);
+  }
+
+  // simple pop sound via WebAudio
+  function playPop(){
+    try{
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type='square'; o.frequency.value = 600;
+      g.gain.value = 0.05;
+      o.connect(g); g.connect(ctx.destination);
+      o.start();
+      setTimeout(()=>{ g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.08); o.stop(ctx.currentTime+0.09); ctx.close(); }, 90);
+    }catch(e){/* ignore if audio blocked */}
+  }
+
+  function startGame(){
+    if(running) return;
+    running = true;
+    score = 0;
+    time = 30;
+    scoreEl.textContent = score;
+    timeEl.textContent = time;
+    startScreen.style.display = 'none';
+    endScreen.style.display = 'none';
+
+    // spawn faster as time passes
+    spawnInterval = setInterval(()=>{ makePigeon(); }, 700);
+    // also spawn an initial burst
+    for(let i=0;i<4;i++){ setTimeout(makePigeon, i*300); }
+
+    timerInterval = setInterval(()=>{
+      time -= 1;
+      timeEl.textContent = time;
+      if(time <= 0) stopGame();
+    },1000);
+  }
+
+  function stopGame(){
+    running = false;
+    clearInterval(spawnInterval); clearInterval(timerInterval);
+    // remove remaining pigeons
+    document.querySelectorAll('.pigeon').forEach(p=>p.remove());
+    finalScore.textContent = score;
+    let msg = '¡Buen trabajo!';
+    if(score >= 25) msg = '¡Eres la reina de las palomas!';
+    else if(score >= 15) msg = '¡Vaya puntería!';
+    else if(score >= 8) msg = '¡No está mal!';
+    finalMsg.textContent = msg;
+    endScreen.style.display = 'flex';
+  }
+
+  startBtn.addEventListener('click', startGame);
+  replayBtn.addEventListener('click', startGame);
+
+  // allow tapping empty space to spawn a pigeon (fun)
+  playArea.addEventListener('click', (e)=>{
+    if(!running) return;
+    // 20% chance that clicking empty space spawns a fast pigeon
+    if(Math.random() < 0.18) makePigeon();
+  });
+
+  // keyboard support: space to start
+  window.addEventListener('keydown', (e)=>{ if(e.key === ' '){ e.preventDefault(); if(!running) startGame(); } });
+
+  // friendly hint for mobile users
+  if(/Mobi|Android/i.test(navigator.userAgent)){
+    document.querySelector('.small').textContent = 'Toca las palomas para conseguir puntos. ¡30 segundos para reventar a todas!';
+  }
+})();
+</script>
+
+
+</body></html>
